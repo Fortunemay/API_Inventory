@@ -27,6 +27,8 @@ public partial class TbDocumentChangeRequestDetail
 
     public DateTime? UpdatedDate { get; set; }
 
+    public bool? IsArchived { get; set; }
+
     public virtual TbDocument? Doc { get; set; }
 
     public virtual TbChangeRequestType? RequestType { get; set; }

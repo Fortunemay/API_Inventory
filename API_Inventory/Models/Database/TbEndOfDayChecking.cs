@@ -29,5 +29,7 @@ public partial class TbEndOfDayChecking
 
     public DateTime? UpdatedDate { get; set; }
 
+    public bool? IsArchived { get; set; }
+
     public virtual TbStorehouseList? StorehouseList { get; set; }
 }

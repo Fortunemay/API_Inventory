@@ -31,6 +31,8 @@ public partial class TbWorkFlowTransaction
 
     public DateTime? UpdatedDate { get; set; }
 
+    public bool? IsArchived { get; set; }
+
     public virtual TbDocument Doc { get; set; } = null!;
 
     public virtual TbWorkFlow WorkFlow { get; set; } = null!;

@@ -51,6 +51,8 @@ public partial class TbProductTransaction
 
     public DateTime? UpdatedDate { get; set; }
 
+    public bool? IsArchived { get; set; }
+
     public virtual TbDocument? Doc { get; set; }
 
     public virtual TbStorehouseList? StorehouseList { get; set; }

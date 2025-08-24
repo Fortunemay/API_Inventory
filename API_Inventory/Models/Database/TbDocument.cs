@@ -111,6 +111,8 @@ public partial class TbDocument
 
     public string? Consignee { get; set; }
 
+    public bool? IsArchived { get; set; }
+
     public virtual TbCompanyProfile? Comp { get; set; }
 
     public virtual TbDocumentType? DocTypeNavigation { get; set; }

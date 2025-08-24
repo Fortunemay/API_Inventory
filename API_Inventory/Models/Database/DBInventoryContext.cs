@@ -15,6 +15,10 @@ public partial class DBInventoryContext : DbContext
     {
     }
 
+    public virtual DbSet<AdvancePayment> AdvancePayments { get; set; }
+
+    public virtual DbSet<Datum> Data { get; set; }
+
     public virtual DbSet<TbAccountingType> TbAccountingTypes { get; set; }
 
     public virtual DbSet<TbAct> TbActs { get; set; }
@@ -69,8 +73,6 @@ public partial class DBInventoryContext : DbContext
 
     public virtual DbSet<TbDocumentsAdvPayment> TbDocumentsAdvPayments { get; set; }
 
-    public virtual DbSet<TbDocumentsBackup> TbDocumentsBackups { get; set; }
-
     public virtual DbSet<TbDocumentsDummy> TbDocumentsDummies { get; set; }
 
     public virtual DbSet<TbDriver> TbDrivers { get; set; }
@@ -116,8 +118,6 @@ public partial class DBInventoryContext : DbContext
     public virtual DbSet<TbProductStatus> TbProductStatuses { get; set; }
 
     public virtual DbSet<TbProductTransaction> TbProductTransactions { get; set; }
-
-    public virtual DbSet<TbProductTransactionsBackup> TbProductTransactionsBackups { get; set; }
 
     public virtual DbSet<TbProductType> TbProductTypes { get; set; }
 
@@ -169,6 +169,10 @@ public partial class DBInventoryContext : DbContext
 
     public virtual DbSet<TbTdocumntFirstDate> TbTdocumntFirstDates { get; set; }
 
+    public virtual DbSet<TbTotherSale> TbTotherSales { get; set; }
+
+    public virtual DbSet<TbTstockTransfer> TbTstockTransfers { get; set; }
+
     public virtual DbSet<TbTypeOfApprovedWorkflow> TbTypeOfApprovedWorkflows { get; set; }
 
     public virtual DbSet<TbTypeOfApprovedWorkflowList> TbTypeOfApprovedWorkflowLists { get; set; }
@@ -185,13 +189,9 @@ public partial class DBInventoryContext : DbContext
 
     public virtual DbSet<TbWorkFlow> TbWorkFlows { get; set; }
 
-    public virtual DbSet<TbWorkFlowBackup> TbWorkFlowBackups { get; set; }
-
     public virtual DbSet<TbWorkFlowStatus> TbWorkFlowStatuses { get; set; }
 
     public virtual DbSet<TbWorkFlowTransaction> TbWorkFlowTransactions { get; set; }
-
-    public virtual DbSet<TbWorkFlowTransactionsBackup> TbWorkFlowTransactionsBackups { get; set; }
 
     public virtual DbSet<TbWorkFlowType> TbWorkFlowTypes { get; set; }
 
@@ -212,6 +212,43 @@ public partial class DBInventoryContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.UseCollation("Thai_CI_AS");
+
+        modelBuilder.Entity<AdvancePayment>(entity =>
+        {
+            entity
+                .HasNoKey()
+                .ToTable("AdvancePayment$");
+
+            entity.Property(e => e.CompId).HasColumnName("CompID");
+            entity.Property(e => e.DocCode).HasMaxLength(255);
+            entity.Property(e => e.FromStorehouseListId).HasColumnName("FromStorehouseListID");
+            entity.Property(e => e.ProductCode).HasMaxLength(255);
+            entity.Property(e => e.UserCode).HasMaxLength(255);
+        });
+
+        modelBuilder.Entity<Datum>(entity =>
+        {
+            entity
+                .HasNoKey()
+                .ToTable("Data$");
+
+            entity.Property(e => e._310002669).HasColumnName("310002669");
+            entity.Property(e => e._310004128).HasColumnName("310004128");
+            entity.Property(e => e._310004133).HasColumnName("310004133");
+            entity.Property(e => e._310004138).HasColumnName("310004138");
+            entity.Property(e => e._310004141).HasColumnName("310004141");
+            entity.Property(e => e._310004379).HasColumnName("310004379");
+            entity.Property(e => e._310004838).HasColumnName("310004838");
+            entity.Property(e => e.ชอ)
+                .HasMaxLength(255)
+                .HasColumnName("ชื่อ");
+            entity.Property(e => e.ชอกจกรรม)
+                .HasMaxLength(255)
+                .HasColumnName("ชื่อกิจกรรม");
+            entity.Property(e => e.เลขทเอกสาร)
+                .HasMaxLength(255)
+                .HasColumnName("เลขที่เอกสาร");
+        });
 
         modelBuilder.Entity<TbAccountingType>(entity =>
         {
@@ -658,6 +695,8 @@ public partial class DBInventoryContext : DbContext
 
             entity.HasIndex(e => new { e.DocType, e.DocDate }, "idx_DocumentDocTypeAndDocDate");
 
+            entity.HasIndex(e => new { e.DocType, e.IsAdvancePay, e.UpdatedDate }, "idx_DocumentDocTypeIsAdvancePay");
+
             entity.HasIndex(e => e.DocType, "idx_DocumentDocTypePayment");
 
             entity.HasIndex(e => new { e.DocType, e.UpdatedDate }, "idx_DocumentDocTypeUpdate");
@@ -813,6 +852,7 @@ public partial class DBInventoryContext : DbContext
             entity.Property(e => e.FirstReviewer).HasMaxLength(255);
             entity.Property(e => e.FromStorehouseListId).HasColumnName("FromStorehouseListID");
             entity.Property(e => e.IsAccepted).HasDefaultValue(false);
+            entity.Property(e => e.IsArchived).HasDefaultValue(false);
             entity.Property(e => e.IsConfirm).HasDefaultValue(false);
             entity.Property(e => e.IsFormEntry).HasDefaultValue(false);
             entity.Property(e => e.IssueType).HasMaxLength(4);
@@ -864,6 +904,7 @@ public partial class DBInventoryContext : DbContext
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime");
             entity.Property(e => e.DocId).HasColumnName("DocID");
+            entity.Property(e => e.IsArchived).HasDefaultValue(false);
             entity.Property(e => e.RequestFrom).HasMaxLength(500);
             entity.Property(e => e.RequestReason).HasMaxLength(500);
             entity.Property(e => e.RequestTo).HasMaxLength(500);
@@ -980,53 +1021,6 @@ public partial class DBInventoryContext : DbContext
             entity.Property(e => e.WorkFlowStatusName).HasMaxLength(255);
         });
 
-        modelBuilder.Entity<TbDocumentsBackup>(entity =>
-        {
-            entity
-                .HasNoKey()
-                .ToTable("TbDocumentsBackup");
-
-            entity.Property(e => e.AcceptedDate).HasColumnType("datetime");
-            entity.Property(e => e.Approvers).HasMaxLength(255);
-            entity.Property(e => e.AreaId).HasColumnName("AreaID");
-            entity.Property(e => e.AttFiles).HasMaxLength(255);
-            entity.Property(e => e.CarLicense).HasMaxLength(255);
-            entity.Property(e => e.CompId).HasColumnName("CompID");
-            entity.Property(e => e.Consignee).HasMaxLength(1400);
-            entity.Property(e => e.CreatedDate).HasColumnType("datetime");
-            entity.Property(e => e.CustomerName).HasMaxLength(1400);
-            entity.Property(e => e.DelivName).HasMaxLength(255);
-            entity.Property(e => e.DocCode).HasMaxLength(22);
-            entity.Property(e => e.DocDate).HasColumnType("datetime");
-            entity.Property(e => e.DocId).HasColumnName("DocID");
-            entity.Property(e => e.DocStatus).HasMaxLength(20);
-            entity.Property(e => e.DocStatusId).HasColumnName("DocStatusID");
-            entity.Property(e => e.DueDate).HasColumnType("datetime");
-            entity.Property(e => e.ExposeDate).HasMaxLength(10);
-            entity.Property(e => e.ExposeTime).HasMaxLength(10);
-            entity.Property(e => e.FirstReviewer).HasMaxLength(255);
-            entity.Property(e => e.FromStorehouseListId).HasColumnName("FromStorehouseListID");
-            entity.Property(e => e.IssueType).HasMaxLength(4);
-            entity.Property(e => e.OwnerName).HasMaxLength(255);
-            entity.Property(e => e.PaymentCode).HasMaxLength(255);
-            entity.Property(e => e.ReceiveFrom).HasMaxLength(255);
-            entity.Property(e => e.RefCode).HasMaxLength(255);
-            entity.Property(e => e.Requester).HasMaxLength(255);
-            entity.Property(e => e.SaleName).HasMaxLength(255);
-            entity.Property(e => e.SecondReviewer).HasMaxLength(255);
-            entity.Property(e => e.SecondSignature).HasMaxLength(255);
-            entity.Property(e => e.Signature).HasMaxLength(255);
-            entity.Property(e => e.TaxId)
-                .HasMaxLength(20)
-                .HasColumnName("TaxID");
-            entity.Property(e => e.Telephone).HasMaxLength(1400);
-            entity.Property(e => e.ToStorehouseListId).HasColumnName("ToStorehouseListID");
-            entity.Property(e => e.TranferCode).HasMaxLength(255);
-            entity.Property(e => e.TranferType).HasMaxLength(250);
-            entity.Property(e => e.UpdatedDate).HasColumnType("datetime");
-            entity.Property(e => e.WarehouseId).HasColumnName("WarehouseID");
-        });
-
         modelBuilder.Entity<TbDocumentsDummy>(entity =>
         {
             entity.HasKey(e => new { e.DummyId, e.StorehouseListId, e.UserId }).HasName("PK_TbDocumentsTemp");
@@ -1086,6 +1080,7 @@ public partial class DBInventoryContext : DbContext
                 .HasColumnType("datetime");
             entity.Property(e => e.Description).HasMaxLength(255);
             entity.Property(e => e.IsActive).HasDefaultValue(true);
+            entity.Property(e => e.IsArchived).HasDefaultValue(false);
             entity.Property(e => e.ProductCode).HasMaxLength(16);
             entity.Property(e => e.Remark).HasMaxLength(255);
             entity.Property(e => e.RowsId).HasColumnName("RowsID");
@@ -1711,6 +1706,7 @@ public partial class DBInventoryContext : DbContext
                 .HasColumnType("datetime");
             entity.Property(e => e.DocId).HasColumnName("DocID");
             entity.Property(e => e.ExpiredDate).HasColumnType("datetime");
+            entity.Property(e => e.IsArchived).HasDefaultValue(false);
             entity.Property(e => e.IssueDate).HasColumnType("datetime");
             entity.Property(e => e.PaymentCode).HasMaxLength(50);
             entity.Property(e => e.ProductCode).HasMaxLength(16);
@@ -1726,26 +1722,6 @@ public partial class DBInventoryContext : DbContext
             entity.HasOne(d => d.StorehouseList).WithMany(p => p.TbProductTransactions)
                 .HasForeignKey(d => d.StorehouseListId)
                 .HasConstraintName("FK__TbProduct__Store__1431ED0D");
-        });
-
-        modelBuilder.Entity<TbProductTransactionsBackup>(entity =>
-        {
-            entity
-                .HasNoKey()
-                .ToTable("TbProductTransactionsBackup");
-
-            entity.Property(e => e.AttFiles).HasMaxLength(255);
-            entity.Property(e => e.CreatedDate).HasColumnType("datetime");
-            entity.Property(e => e.DocId).HasColumnName("DocID");
-            entity.Property(e => e.ExpiredDate).HasColumnType("datetime");
-            entity.Property(e => e.IssueDate).HasColumnType("datetime");
-            entity.Property(e => e.PaymentCode).HasMaxLength(50);
-            entity.Property(e => e.ProductCode).HasMaxLength(16);
-            entity.Property(e => e.RefCode).HasMaxLength(50);
-            entity.Property(e => e.StatusId).HasColumnName("StatusID");
-            entity.Property(e => e.StorehouseListId).HasColumnName("StorehouseListID");
-            entity.Property(e => e.TransId).HasColumnName("TransID");
-            entity.Property(e => e.UpdatedDate).HasColumnType("datetime");
         });
 
         modelBuilder.Entity<TbProductType>(entity =>
@@ -2531,6 +2507,58 @@ public partial class DBInventoryContext : DbContext
             entity.Property(e => e.StorehouseListId).HasColumnName("StorehouseListID");
         });
 
+        modelBuilder.Entity<TbTotherSale>(entity =>
+        {
+            entity
+                .HasNoKey()
+                .ToTable("TbTOtherSale");
+
+            entity.Property(e => e.AmountBeforeDiscount).HasColumnType("decimal(18, 4)");
+            entity.Property(e => e.Arname)
+                .HasMaxLength(255)
+                .HasColumnName("ARName");
+            entity.Property(e => e.BranchCode).HasMaxLength(50);
+            entity.Property(e => e.CompanyCode).HasMaxLength(50);
+            entity.Property(e => e.CompanyName).HasMaxLength(255);
+            entity.Property(e => e.DocDate).HasColumnType("datetime");
+            entity.Property(e => e.DocNo).HasMaxLength(50);
+            entity.Property(e => e.Id).ValueGeneratedOnAdd();
+            entity.Property(e => e.ItemCode).HasMaxLength(50);
+            entity.Property(e => e.StorageCode).HasMaxLength(50);
+            entity.Property(e => e.StorageName).HasMaxLength(255);
+            entity.Property(e => e.TaxNo).HasMaxLength(50);
+            entity.Property(e => e.Whcode)
+                .HasMaxLength(50)
+                .HasColumnName("WHCode");
+            entity.Property(e => e.Whname)
+                .HasMaxLength(255)
+                .HasColumnName("WHName");
+        });
+
+        modelBuilder.Entity<TbTstockTransfer>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__TbTStock__3214EC073C47E25A");
+
+            entity.ToTable("TbTStockTransfer");
+
+            entity.HasIndex(e => new { e.DocNo, e.DocDate }, "UX_TbTStockTransfer_DocNo_DocDate").IsUnique();
+
+            entity.Property(e => e.BaseQty).HasColumnType("decimal(18, 4)");
+            entity.Property(e => e.CompanyCode).HasMaxLength(50);
+            entity.Property(e => e.CompanyName).HasMaxLength(200);
+            entity.Property(e => e.CreatedDate)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+            entity.Property(e => e.DocDate).HasColumnType("datetime");
+            entity.Property(e => e.DocNo).HasMaxLength(50);
+            entity.Property(e => e.FromShelfCode).HasMaxLength(50);
+            entity.Property(e => e.ItemCode).HasMaxLength(50);
+            entity.Property(e => e.SaleCode).HasMaxLength(50);
+            entity.Property(e => e.ToShelfCode).HasMaxLength(50);
+            entity.Property(e => e.WhCode).HasMaxLength(50);
+            entity.Property(e => e.WhName).HasMaxLength(200);
+        });
+
         modelBuilder.Entity<TbTypeOfApprovedWorkflow>(entity =>
         {
             entity.HasKey(e => e.ApproveTypeId).HasName("PK__TbTypeOf__22498120481B0BFF");
@@ -2713,17 +2741,6 @@ public partial class DBInventoryContext : DbContext
                 .HasConstraintName("FK__TbWorkFlo__WorkF__589C25F3");
         });
 
-        modelBuilder.Entity<TbWorkFlowBackup>(entity =>
-        {
-            entity
-                .HasNoKey()
-                .ToTable("TbWorkFlowBackup");
-
-            entity.Property(e => e.CreatedDate).HasColumnType("datetime");
-            entity.Property(e => e.StorehouseListId).HasColumnName("StorehouseListID");
-            entity.Property(e => e.UpdatedDate).HasColumnType("datetime");
-        });
-
         modelBuilder.Entity<TbWorkFlowStatus>(entity =>
         {
             entity.HasKey(e => e.WorkFlowStatusId).HasName("PK__TbWorkFl__7D2098F2B108F5CD");
@@ -2784,6 +2801,7 @@ public partial class DBInventoryContext : DbContext
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime");
             entity.Property(e => e.DocId).HasColumnName("DocID");
+            entity.Property(e => e.IsArchived).HasDefaultValue(false);
             entity.Property(e => e.UpdatedDate).HasColumnType("datetime");
 
             entity.HasOne(d => d.Doc).WithMany(p => p.TbWorkFlowTransactions)
@@ -2799,18 +2817,6 @@ public partial class DBInventoryContext : DbContext
             entity.HasOne(d => d.WorkFlowStatus).WithMany(p => p.TbWorkFlowTransactions)
                 .HasForeignKey(d => d.WorkFlowStatusId)
                 .HasConstraintName("FK__TbWorkFlo__WorkF__4C6B5938");
-        });
-
-        modelBuilder.Entity<TbWorkFlowTransactionsBackup>(entity =>
-        {
-            entity
-                .HasNoKey()
-                .ToTable("TbWorkFlowTransactionsBackup");
-
-            entity.Property(e => e.CancelRemark).HasMaxLength(300);
-            entity.Property(e => e.CreatedDate).HasColumnType("datetime");
-            entity.Property(e => e.DocId).HasColumnName("DocID");
-            entity.Property(e => e.UpdatedDate).HasColumnType("datetime");
         });
 
         modelBuilder.Entity<TbWorkFlowType>(entity =>
