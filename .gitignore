@@ -1,0 +1,12 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/.vs
+/API_Staging/.vs
+/API_Staging/API_Staging/bin/Debug/net9.0
+/API_Staging/API_Staging/obj
+/API_Staging/API_Staging/bin
+/API_Staging/API_Staging/.config
+/API_Staging/API_Staging/Properties/PublishProfiles
+/API_Staging/API_Staging/API_Staging.csproj.user

@@ -1,0 +1,19 @@
+@Inventory_API_HostAddress = https://localhost:7265
+
+POST {{Inventory_API_HostAddress}}/api/Auth/Login
+Accept: */*
+Content-Type: application/json
+{
+  "username": "70016141",
+  "password": "Namaeno@25#4"
+}
+###
+
+POST {{Inventory_API_HostAddress}}/api/Horeca/GetCustomerOntrade
+Accept: */*
+Authorization: Bearer eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoiNzAwNTkyNDUiLCJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9lbWFpbGFkZHJlc3MiOiJzdXBhbHVjay5rQHRoYWliZXYuY29tIiwiZXhwIjoxNzUxMDgwOTgxLCJpc3MiOiJNeUFwcGxpY2F0aW9uLUFQSSIsImF1ZCI6Ik15QXBwbGljYXRpb24tQXVkaWVuY2UifQ.ux3l35qcnS7xKrvIWlwgaYyCnPzWpurm3EIe3qKxjYGaUaLAVJzBWeF2KxZ-nQ0NxziMRv_laKwkk4zGSji5yQ
+Content-Type: application/json
+{
+  "regionCode": "01"
+}
+###

@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>API_Inventory</name>
+    </assembly>
+    <members>
+        <member name="M:API_Inventory.Controllers.ReportController.GetDailyReport(API_Inventory.Models.Entities.IMS.DailyReportReq)">
+            <summary>
+            Get Daily Report
+            </summary>
+            <param name="req"></param>
+            <returns></returns>
+        </member>
+        <member name="M:API_Inventory.Controllers.ReportController.GetMovementReport(API_Inventory.Models.Entities.IMS.MovementReportReq)">
+            <summary>
+            Get Movement Report
+            </summary>
+            <param name="req"></param>
+            <returns></returns>
+        </member>
+        <member name="M:API_Inventory.Controllers.ReportController.GetAdvanceReport(API_Inventory.Models.Entities.IMS.AdvanceReportReq)">
+            <summary>
+            Get Advance Report
+            </summary>
+            <param name="req"></param>
+            <returns></returns>
+        </member>
+    </members>
+</doc>

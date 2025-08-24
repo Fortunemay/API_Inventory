@@ -1,0 +1,2 @@
+/*Inventory*/
+Scaffold-DbContext "Server=10.5.56.35;Database=DBInventory;User ID=ims;Password=RtmIms@2024; Encrypt=false;" Microsoft.EntityFrameworkCore.SqlServer -OutputDir Models/Database -f  -Context DBInventoryContext
